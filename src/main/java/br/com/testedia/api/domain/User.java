@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "usuario")
 @Data
 public class User {
 
