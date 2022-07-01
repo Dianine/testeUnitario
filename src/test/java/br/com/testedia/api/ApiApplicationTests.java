@@ -10,5 +10,4 @@ class ApiApplicationTests {
 	void main() {
 		ApiApplication.main(new String[] {});
 	}
-
 }
