@@ -3,6 +3,7 @@ package br.com.testedia.api.services;
 import br.com.testedia.api.domain.User;
 import br.com.testedia.api.domain.dto.UserDTO;
 import br.com.testedia.api.repository.UserRepository;
+import br.com.testedia.api.services.exception.DataIntegratyViolationException;
 import br.com.testedia.api.services.exception.ObjNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,9 +15,12 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -26,6 +30,8 @@ class UserServiceTest {
     public static final String NAME     = "Dianine";
     public static final String EMAIL    = "dianine@gmail.com";
     public static final String PASSWORD = "123";
+    public static final String OBJETO_NÃO_ENCONTRADO = "Objeto não encontrado";
+    public static final int INDEX = 0;
 
 
     @InjectMocks
@@ -48,11 +54,49 @@ class UserServiceTest {
     }
 
     @Test
-    void create() {
+    void whenCreateThenReturnSuccess() {
+        when(repository.save(any())).thenReturn(user);
+
+        User response = service.create(userDTO);
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(User.class, response.getClass());
+        Assertions.assertEquals(ID, response.getId());
+        Assertions.assertEquals(NAME, response.getName());
+        Assertions.assertEquals(EMAIL, response.getEmail());
+        Assertions.assertEquals(PASSWORD, response.getPassword());
+
+
+    }
+    @Test
+    void whenCreateThenReturnAnDataIntergrityVilationException() {
+        when(repository.findByEmail(anyString())).thenReturn(optionalUser);
+
+    try {
+        optionalUser.get().setId(2); //Id existente é o 1, setado lá em baixo. Assim ele cai na exception
+        service.create(userDTO);
+    } catch (Exception ex) {
+        Assertions.assertEquals(DataIntegratyViolationException.class, ex.getClass());
+        Assertions.assertEquals("E-mail já Cadastrado no Sistema", ex.getMessage());
+    }
+
+
     }
 
     @Test
-    void findAll() {
+    void whwnFindAllThenReturnAnListOfUsers() {
+        when(repository.findAll()).thenReturn(List.of(user));
+
+        List<User> response = service.findAll();
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(1, response.size());
+        Assertions.assertEquals(User.class, response.get(INDEX).getClass());
+
+        Assertions.assertEquals(ID, response.get(INDEX).getId());
+        Assertions.assertEquals(NAME, response.get(INDEX).getName());
+        Assertions.assertEquals(EMAIL, response.get(INDEX).getEmail());
+        Assertions.assertEquals(PASSWORD, response.get(INDEX).getPassword());
     }
 
     @Test
@@ -71,19 +115,31 @@ class UserServiceTest {
     @Test
     //Teste do ambiente negativo
     void whenfindByIdThenReturnAnObjectNotFoundException() {
-        when(repository.findById(Mockito.anyInt())).thenThrow(new ObjNotFoundException("Objeto não encontrado"));
+        when(repository.findById(Mockito.anyInt())).thenThrow(new ObjNotFoundException(OBJETO_NÃO_ENCONTRADO));
 
         try {
             service.findById(ID);
         } catch (Exception ex) {
             Assertions.assertEquals(ObjNotFoundException.class, ex.getClass());
-            Assertions.assertEquals("Objeto não encontrado", ex.getMessage());
+            Assertions.assertEquals(OBJETO_NÃO_ENCONTRADO, ex.getMessage());
         }
 
     }
 
     @Test
-    void update() {
+    void whenUpdateThenReturnSuccess() {
+        when(repository.save(any())).thenReturn(user);
+
+        User response = service.update(userDTO);
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(User.class, response.getClass());
+        Assertions.assertEquals(ID, response.getId());
+        Assertions.assertEquals(NAME, response.getName());
+        Assertions.assertEquals(EMAIL, response.getEmail());
+        Assertions.assertEquals(PASSWORD, response.getPassword());
+
+
     }
 
     @Test
