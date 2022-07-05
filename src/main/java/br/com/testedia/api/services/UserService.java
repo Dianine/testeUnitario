@@ -37,6 +37,7 @@ public class UserService {
         return repository.findAll();
     }
 
+
     public User findById(Integer id) {
         Optional<User> obj = repository.findById(id);
         return obj.orElseThrow(()-> new ObjNotFoundException("Objeto não encontrado"));
