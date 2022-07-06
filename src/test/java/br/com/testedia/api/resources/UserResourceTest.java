@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class UserResourceTest {
@@ -123,7 +123,16 @@ class UserResourceTest {
     }
 
     @Test
-    void delete() {
+    void whenDeleteThenReturnSuccess() {
+        doNothing().when(service).delete(any());
+
+        ResponseEntity<UserDTO> response = resource.delete(ID);
+
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(ResponseEntity.class, response.getClass());
+        verify(service, times(1)).delete(anyInt());//verifica se foi chamado mais de uma vez
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+
     }
     private void startUser() {
         user = new User(ID, NAME, EMAIL, PASSWORD);
